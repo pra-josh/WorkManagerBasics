@@ -2,14 +2,17 @@ package com.pra.workmangerdemo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.Observer
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import com.pra.workmangerdemo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+
+    companion object {
+        const val KEY_COUNT_VALUE = "key_count_value"
+    }
 
     lateinit var mBinding: ActivityMainBinding
 
@@ -18,20 +21,32 @@ class MainActivity : AppCompatActivity() {
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
 
-        val constraints = Constraints.Builder()
-            .setRequiresCharging(true)
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        val constraints = Constraints.Builder().setRequiresCharging(true)
+            .setRequiredNetworkType(NetworkType.CONNECTED).build()
+
+
+        val data = Data.Builder().putInt(KEY_COUNT_VALUE, 12500).build()
 
         var workManager: WorkManager = WorkManager.getInstance(applicationContext)
 
-        val uploadWorkRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java)
-            .setConstraints(constraints)
-            .build()
+        val uploadWorkRequest =
+            OneTimeWorkRequest.Builder(UploadWorker::class.java).setConstraints(constraints)
+                .setInputData(data).build()
 
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
             workManager.enqueue(uploadWorkRequest)
         }
+
+        workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).observe(this, Observer {
+            if (it.state.isFinished) {
+                val data = it.outputData
+                val message = data.getString(UploadWorker.WORKER_TIME)
+                Toast.makeText(
+                    applicationContext, "" + message, Toast.LENGTH_SHORT
+                ).show()
+            }
+            mBinding.tvStatus.text = it.state.name
+        })
 
     }
 
