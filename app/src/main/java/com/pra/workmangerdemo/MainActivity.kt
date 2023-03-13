@@ -18,17 +18,20 @@ class MainActivity : AppCompatActivity() {
         mBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(mBinding.root)
 
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
         var workManager: WorkManager = WorkManager.getInstance(applicationContext)
 
         val uploadWorkRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java)
+            .setConstraints(constraints)
             .build()
 
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
             workManager.enqueue(uploadWorkRequest)
         }
-
-
 
     }
 
