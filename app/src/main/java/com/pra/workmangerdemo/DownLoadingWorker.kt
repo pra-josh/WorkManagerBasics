@@ -8,13 +8,13 @@ import androidx.work.WorkerParameters
 import java.text.SimpleDateFormat
 import java.util.*
 
-class FilteringWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class DownLoadingWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
 
 
     override fun doWork(): Result {
         try {
             for (i in 0 .. 3000) {
-                Log.i("MYTAG", "Filtering $i")
+                Log.i("MYTAG", "Downloading $i")
             }
             return Result.success()
         } catch (e: java.lang.Exception) {

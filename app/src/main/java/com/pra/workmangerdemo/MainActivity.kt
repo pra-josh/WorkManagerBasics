@@ -41,8 +41,19 @@ class MainActivity : AppCompatActivity() {
             OneTimeWorkRequest.Builder(CompressingWorker::class.java).setConstraints(constraints)
                 .setInputData(data).build()
 
+
+
+
+        val downloadRequest =
+            OneTimeWorkRequest.Builder(DownLoadingWorker::class.java)
+               .build()
+
+        val paralleworks = mutableListOf<OneTimeWorkRequest>()
+        paralleworks.add(downloadRequest)
+        paralleworks.add(filteringRequest)
+
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
-            workManager.beginWith(filteringRequest).then(compressingRequest).then(uploadWorkRequest)
+            workManager.beginWith(paralleworks).then(compressingRequest).then(uploadWorkRequest)
                 .enqueue()
         }
 
