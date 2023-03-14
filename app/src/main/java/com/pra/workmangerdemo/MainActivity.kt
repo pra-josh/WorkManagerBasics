@@ -33,8 +33,17 @@ class MainActivity : AppCompatActivity() {
             OneTimeWorkRequest.Builder(UploadWorker::class.java).setConstraints(constraints)
                 .setInputData(data).build()
 
+        val filteringRequest =
+            OneTimeWorkRequest.Builder(FilteringWorker::class.java).setConstraints(constraints)
+                .setInputData(data).build()
+
+        val compressingRequest =
+            OneTimeWorkRequest.Builder(CompressingWorker::class.java).setConstraints(constraints)
+                .setInputData(data).build()
+
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
-            workManager.enqueue(uploadWorkRequest)
+            workManager.beginWith(filteringRequest).then(compressingRequest).then(uploadWorkRequest)
+                .enqueue()
         }
 
         workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).observe(this, Observer {
