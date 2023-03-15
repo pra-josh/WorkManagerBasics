@@ -20,9 +20,8 @@ class UploadWorker(context: Context, params: WorkerParameters) : Worker(context,
         val data = inputData.getInt(MainActivity.KEY_COUNT_VALUE, 0)
         try {
             for (i in 0 until data) {
-                Log.i("WorkManager", "Uploading $i")
+                Log.i("WorkManager", "Uploading $i") 
             }
-
             val time = SimpleDateFormat("dd/M/yyyy hh:mm:SS")
             val currentDate = time.format(Date())
 

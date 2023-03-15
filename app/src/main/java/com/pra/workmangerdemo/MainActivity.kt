@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.work.*
 import com.pra.workmangerdemo.databinding.ActivityMainBinding
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
@@ -15,6 +16,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     lateinit var mBinding: ActivityMainBinding
+
+    lateinit var workManager: WorkManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +30,7 @@ class MainActivity : AppCompatActivity() {
 
         val data = Data.Builder().putInt(KEY_COUNT_VALUE, 12500).build()
 
-        var workManager: WorkManager = WorkManager.getInstance(applicationContext)
+        workManager = WorkManager.getInstance(applicationContext)
 
         val uploadWorkRequest =
             OneTimeWorkRequest.Builder(UploadWorker::class.java).setConstraints(constraints)
@@ -42,19 +45,17 @@ class MainActivity : AppCompatActivity() {
                 .setInputData(data).build()
 
 
-
-
-        val downloadRequest =
-            OneTimeWorkRequest.Builder(DownLoadingWorker::class.java)
-               .build()
+        val downloadRequest = OneTimeWorkRequest.Builder(DownLoadingWorker::class.java).build()
 
         val paralleworks = mutableListOf<OneTimeWorkRequest>()
         paralleworks.add(downloadRequest)
         paralleworks.add(filteringRequest)
 
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
-            workManager.beginWith(paralleworks).then(compressingRequest).then(uploadWorkRequest)
-                .enqueue()
+            /* workManager.beginWith(paralleworks).then(compressingRequest).then(uploadWorkRequest)
+                 .enqueue()*/
+            setPeriodicWorkRequest()
+
         }
 
         workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).observe(this, Observer {
@@ -67,6 +68,19 @@ class MainActivity : AppCompatActivity() {
             }
             mBinding.tvStatus.text = it.state.name
         })
+
+    }
+
+    private fun setPeriodicWorkRequest() {
+        val periodicRequest =
+            PeriodicWorkRequest.Builder(DownLoadingWorker::class.java,
+               16,TimeUnit.MINUTES).build()
+
+        workManager.enqueue(periodicRequest)
+    }
+
+
+    private fun setOneTimeWorkRequest() {
 
     }
 
