@@ -32,55 +32,20 @@ class MainActivity : AppCompatActivity() {
 
         workManager = WorkManager.getInstance(applicationContext)
 
-        val uploadWorkRequest =
-            OneTimeWorkRequest.Builder(UploadWorker::class.java).setConstraints(constraints)
-                .setInputData(data).build()
+        val uploadWorkRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java).build()
 
-        val filteringRequest =
-            OneTimeWorkRequest.Builder(FilteringWorker::class.java).setConstraints(constraints)
-                .setInputData(data).build()
-
-        val compressingRequest =
-            OneTimeWorkRequest.Builder(CompressingWorker::class.java).setConstraints(constraints)
-                .setInputData(data).build()
-
-
-        val downloadRequest = OneTimeWorkRequest.Builder(DownLoadingWorker::class.java).build()
-
-        val paralleworks = mutableListOf<OneTimeWorkRequest>()
-        paralleworks.add(downloadRequest)
-        paralleworks.add(filteringRequest)
-
+        var id = uploadWorkRequest.id;
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
-            /* workManager.beginWith(paralleworks).then(compressingRequest).then(uploadWorkRequest)
-                 .enqueue()*/
-            setPeriodicWorkRequest()
 
+            workManager.enqueue(uploadWorkRequest)
         }
 
-        workManager.getWorkInfoByIdLiveData(uploadWorkRequest.id).observe(this, Observer {
+       /* workManager.getWorkInfoByIdLiveData(id).observe(this, Observer {
             if (it.state.isFinished) {
-                val data = it.outputData
-                val message = data.getString(UploadWorker.WORKER_TIME)
-                Toast.makeText(
-                    applicationContext, "" + message, Toast.LENGTH_SHORT
-                ).show()
+
             }
             mBinding.tvStatus.text = it.state.name
-        })
-
-    }
-
-    private fun setPeriodicWorkRequest() {
-        val periodicRequest =
-            PeriodicWorkRequest.Builder(DownLoadingWorker::class.java,
-               16,TimeUnit.MINUTES).build()
-
-        workManager.enqueue(periodicRequest)
-    }
-
-
-    private fun setOneTimeWorkRequest() {
+        })*/
 
     }
 
