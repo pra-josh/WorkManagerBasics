@@ -17,9 +17,6 @@ import kotlin.contracts.contract
 
 class UploadWorker(val context: Context, params: WorkerParameters) : Worker(context, params) {
 
-    companion object {
-        const val WORKER_TIME = "worker_time"
-    }
 
     override fun doWork(): Result {
 
@@ -28,10 +25,6 @@ class UploadWorker(val context: Context, params: WorkerParameters) : Worker(cont
             for (i in 0 until 100) {
                 Log.i("WorkManager", "Uploading $i")
             }
-            val uploadWorkRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java)
-                .setInitialDelay(30, TimeUnit.SECONDS).build()
-            WorkManager.getInstance(context).enqueue(uploadWorkRequest)
-
             return Result.success()
         } catch (e: java.lang.Exception) {
             return Result.failure()

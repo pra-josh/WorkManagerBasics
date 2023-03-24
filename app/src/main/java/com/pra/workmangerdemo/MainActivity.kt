@@ -32,20 +32,23 @@ class MainActivity : AppCompatActivity() {
 
         workManager = WorkManager.getInstance(applicationContext)
 
-        val uploadWorkRequest = OneTimeWorkRequest.Builder(UploadWorker::class.java).build()
+        val uploadWorkRequest = PeriodicWorkRequest.Builder(
+            UploadWorker::class.java, 20, TimeUnit.MINUTES
+        ).build()
 
         var id = uploadWorkRequest.id;
         mBinding.btnOneTimeWorkRequest.setOnClickListener {
-
-            workManager.enqueue(uploadWorkRequest)
+            workManager.enqueueUniquePeriodicWork(
+                "Unique", ExistingPeriodicWorkPolicy.KEEP, uploadWorkRequest
+            )
         }
 
-       /* workManager.getWorkInfoByIdLiveData(id).observe(this, Observer {
-            if (it.state.isFinished) {
+        /* workManager.getWorkInfoByIdLiveData(id).observe(this, Observer {
+             if (it.state.isFinished) {
 
-            }
-            mBinding.tvStatus.text = it.state.name
-        })*/
+             }
+             mBinding.tvStatus.text = it.state.name
+         })*/
 
     }
 
